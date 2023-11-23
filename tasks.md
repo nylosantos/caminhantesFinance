@@ -1,0 +1,5 @@
+- Conectar com Firebase
+- Criar coluna para excluir items
+- Criar Login
+- Criar páginas com resumos mensais e anuais
+- Personalizar cores (criar esquema de cores)
