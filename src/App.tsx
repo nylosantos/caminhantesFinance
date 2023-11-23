@@ -33,6 +33,11 @@ function getWindowSize() {
   return { innerWidth, innerHeight };
 }
 
+export type HandleRadioCheckValueFunction = {
+  redditoValue: boolean;
+  spesaValue: boolean;
+};
+
 function App() {
   // INITIALIZING FIREBASE AND FIREBASE ADMIN
   initFirebase();
@@ -183,6 +188,20 @@ function App() {
 
   function handleIsMenu() {
     setIsMenu(!isMenu);
+    setRadioChecked({ reddito: false, spesa: false });
+  }
+
+  const [radioChecked, setRadioChecked] = useState({
+    reddito: false,
+    spesa: false,
+  });
+  console.log(radioChecked);
+
+  function handleRadioChecked({
+    redditoValue,
+    spesaValue,
+  }: HandleRadioCheckValueFunction) {
+    setRadioChecked({ reddito: redditoValue, spesa: spesaValue });
   }
 
   const handleAddItem = async (item: Item) => {
@@ -295,6 +314,8 @@ function App() {
               categoryList={categoryList}
               isCategorySettings={isCategorySettings}
               pathFirebase={pathFirebase}
+              radioChecked={radioChecked}
+              handleRadioChecked={handleRadioChecked}
             />
           )}
           {/* ITENS */}
@@ -306,6 +327,7 @@ function App() {
             windowSize={windowSize}
             pathFirebase={pathFirebase}
             userId={user ? user?.uid : "fail"}
+            handleRadioChecked={handleRadioChecked}
           />
         </div>
       )}

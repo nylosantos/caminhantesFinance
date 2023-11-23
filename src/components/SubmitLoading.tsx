@@ -32,7 +32,7 @@ export function SubmitLoading({
         ) : (
           <div className="flex flex-col fixed w-screen h-screen top-0 left-0 items-center justify-center bg-transparent transition-all duration-300 z-50">
             {/* SUBMIT LOADING CARD */}
-            <div className="flex flex-col items-center p-6 rounded-3xl bg-klGreen-500 dark:bg-klGreen-500">
+            <div className="flex flex-col items-center p-6 rounded-3xl bg-klgreen-700 dark:bg-klgreen-700">
               <Vortex
                 visible={true}
                 height="80"

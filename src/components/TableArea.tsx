@@ -1,4 +1,5 @@
 import { Category, Item, PathFirebaseProps, windowSizeProps } from "../@types";
+import { HandleRadioCheckValueFunction } from "../App";
 import { TableItem } from "./TableItem";
 
 type Props = {
@@ -9,6 +10,10 @@ type Props = {
   windowSize: windowSizeProps;
   pathFirebase: PathFirebaseProps;
   userId: string;
+  handleRadioChecked: ({
+    redditoValue,
+    spesaValue,
+  }: HandleRadioCheckValueFunction) => void;
 };
 
 export function TableArea({
@@ -19,6 +24,7 @@ export function TableArea({
   windowSize,
   pathFirebase,
   userId,
+  handleRadioChecked,
 }: Props) {
   return (
     <>
@@ -35,7 +41,7 @@ export function TableArea({
               <th className="flex w-1/6 py-3 menuBreak:px-2 justify-end">🗑️</th>
             </tr>
           </thead>
-          <tbody className="[&>*:nth-child(odd)]:bg-red-950/60">
+          <tbody className="[&>*:nth-child(odd)]:bg-red-900/20">
             <>
               {categoriesList.map((category, index) => (
                 <TableItem
@@ -46,6 +52,7 @@ export function TableArea({
                   windowSize={windowSize}
                   pathFirebase={pathFirebase}
                   userId={userId}
+                  handleRadioChecked={handleRadioChecked}
                 />
               ))}
             </>
@@ -101,6 +108,7 @@ export function TableArea({
                   windowSize={windowSize}
                   pathFirebase={pathFirebase}
                   userId={userId}
+                  handleRadioChecked={handleRadioChecked}
                 />
               ))}
             </>

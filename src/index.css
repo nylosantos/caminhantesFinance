@@ -51,7 +51,7 @@ button {
   duration-75;
 }
 button:hover {
-  @apply border-red-500;
+  @apply border-red-700;
 }
 button:focus,
 button:focus-visible {

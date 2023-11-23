@@ -7,11 +7,17 @@ import { collection, getFirestore, query, where } from "firebase/firestore";
 import { app } from "../db/Firebase";
 import { getFirebaseDataFilterById } from "../helpers/firebaseFunctions";
 import { toast } from "react-toastify";
+import { HandleRadioCheckValueFunction } from "../App";
 
 type Props = {
   isCategorySettingsFunction: () => void;
   onAddItem: (item: Item) => void;
   onAddCategory: (category: Category) => void;
+  handleRadioChecked: ({
+    redditoValue,
+    spesaValue,
+  }: HandleRadioCheckValueFunction) => void;
+  radioChecked: { reddito: boolean; spesa: boolean };
   isSettings: boolean;
   categoryList?: Category[];
   isCategorySettings: boolean;
@@ -29,6 +35,8 @@ export function InputArea({
   isCategorySettings,
   isSettings,
   pathFirebase,
+  radioChecked,
+  handleRadioChecked,
 }: Props) {
   const [dateField, setDateField] = useState("");
   const [categoryField, setCategoryField] = useState("");
@@ -42,8 +50,6 @@ export function InputArea({
     color: "",
     expense: false,
   });
-  console.log("ValueField", valueField);
-  console.log("ProvisoryValueField", provisoryValueField);
   useEffect(() => {
     if (categoryField !== "") {
       async function handleDetailsData() {
@@ -150,19 +156,13 @@ export function InputArea({
       color: "",
       expense: false,
     });
+    handleRadioChecked({ redditoValue: false, spesaValue: false });
   };
 
   useEffect(() => {
     clearFields();
   }, [isCategorySettings, isSettings]);
 
-  const onChangeExpense = (e: any) => {
-    setNewCategory({
-      ...newCategory,
-      expense: e.target.value === "Reddito" ? false : true,
-      color: e.target.value === "Reddito" ? "green" : "red",
-    });
-  };
   if (isCategorySettings) {
     return (
       <div className="menuBreak:flex items-center mt-5 p-5 shadow-2xl rounded-xl bg-red-950">
@@ -178,7 +178,7 @@ export function InputArea({
               }
             />
           </div>
-          <div className="flex-1 m-3" onChange={(e) => onChangeExpense(e)}>
+          <div className="flex-1 m-3">
             <div className="font-bold mb-1">Reddito o Spesa?</div>
             <div className="flex gap-5 items-center">
               <div className="flex gap-1 items-center">
@@ -187,6 +187,18 @@ export function InputArea({
                   id="Reddito"
                   name="categoryType"
                   value="Reddito"
+                  checked={radioChecked.reddito}
+                  onClick={() => {
+                    handleRadioChecked({
+                      redditoValue: true,
+                      spesaValue: false,
+                    });
+                    setNewCategory({
+                      ...newCategory,
+                      expense: false,
+                      color: "green",
+                    });
+                  }}
                 />
                 <label htmlFor="Reddito">Reddito</label>
               </div>
@@ -196,6 +208,18 @@ export function InputArea({
                   id="Spesa"
                   name="categoryType"
                   value="Spesa"
+                  checked={radioChecked.spesa}
+                  onClick={() => {
+                    handleRadioChecked({
+                      redditoValue: false,
+                      spesaValue: true,
+                    });
+                    setNewCategory({
+                      ...newCategory,
+                      expense: true,
+                      color: "red",
+                    });
+                  }}
                 />
                 <label htmlFor="Spesa">Spesa</label>
               </div>
@@ -205,7 +229,7 @@ export function InputArea({
         <div className="basis-4/12 m-3">
           <div className="font-bold mb-1">&nbsp;</div>
           <button
-            className="w-full h-7 py-0 px-1 font-assistant rounded bg-red-700 hover:bg-red-500"
+            className="w-full h-7 py-0 px-1 font-assistant rounded bg-red-700 hover:bg-red-800"
             onClick={handleAddCategory}
           >
             Aggiungere Categoria
@@ -297,7 +321,7 @@ export function InputArea({
         <div className="basis-4/12 m-3">
           <div className="font-bold mb-1">&nbsp;</div>
           <button
-            className="w-full h-7 py-0 px-1 font-assistant rounded bg-red-700 hover:bg-red-500"
+            className="w-full h-7 py-0 px-1 font-assistant rounded bg-red-700 hover:bg-red-800"
             onClick={handleAddItem}
           >
             Aggiungere
