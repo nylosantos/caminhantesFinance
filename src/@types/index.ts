@@ -23,6 +23,7 @@ export type Category = {
   color: string;
   title: string;
   expense: Boolean;
+  valueExpected: number;
 };
 
 export type windowSizeProps = {

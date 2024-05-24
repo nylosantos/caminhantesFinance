@@ -5,6 +5,7 @@ import { TableItem } from "./TableItem";
 type Props = {
   isCategorySettings: boolean;
   isSettings: boolean;
+  isHome: boolean;
   list: Item[];
   categoriesList: Category[];
   windowSize: windowSizeProps;
@@ -18,6 +19,7 @@ type Props = {
 
 export function TableArea({
   list,
+  isHome,
   isSettings,
   isCategorySettings,
   categoriesList,
@@ -46,6 +48,7 @@ export function TableArea({
               {categoriesList.map((category, index) => (
                 <TableItem
                   key={index}
+                  isHome
                   category={category}
                   isSettings={isSettings}
                   isCategorySettings={isCategorySettings}
@@ -76,6 +79,42 @@ export function TableArea({
             </>
           </tbody> */}
         </table>
+      ) : isHome ? (
+        <table className="w-full shadow-2xl rounded-xl bg-red-950 border-collapse">
+          <thead>
+            <tr className="flex w-full px-5 p-3 justify-between items-center">
+              <th className="hidden w-3/12 menuBreak:flex w-4/12 py-3 px-0 menuBreak:px-2 text-left">
+                Categoria
+              </th>
+              <th className="flex w-3/12 py-3 px-0 menuBreak:px-2 justify-end">
+                Valore Atteso
+              </th>
+              <th className="flex w-3/12 py-3 px-0 menuBreak:px-2 justify-end">
+                Valore Speso
+              </th>
+              {/* <th className="flex w-1/12 py-3 px-0 menuBreak:px-2">
+                <div className="w-full text-right text-lg">🗑️</div>
+              </th> */}
+            </tr>
+          </thead>
+          <tbody className="[&>*:nth-child(odd)]:bg-red-950/60">
+            <>
+              {categoriesList.map((item, index) => (
+                <TableItem
+                  key={index}
+                  isHome
+                  category={item}
+                  isSettings={isSettings}
+                  isCategorySettings={isCategorySettings}
+                  windowSize={windowSize}
+                  pathFirebase={pathFirebase}
+                  userId={userId}
+                  handleRadioChecked={handleRadioChecked}
+                />
+              ))}
+            </>
+          </tbody>
+        </table>
       ) : (
         <table className="w-full shadow-2xl rounded-xl bg-red-950 border-collapse">
           <thead>
@@ -102,6 +141,7 @@ export function TableArea({
               {list.map((item, index) => (
                 <TableItem
                   key={index}
+                  isHome={false}
                   item={item}
                   isSettings={isSettings}
                   isCategorySettings={isCategorySettings}

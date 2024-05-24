@@ -12,6 +12,7 @@ import { ConfirmDialog } from "primereact/confirmdialog";
 
 type Props = {
   item?: Item;
+  isHome: boolean;
   category?: Category;
   isSettings: boolean;
   isCategorySettings: boolean;
@@ -29,6 +30,7 @@ const db = getFirestore(app);
 
 export function TableItem({
   item,
+  isHome,
   category,
   isSettings,
   isCategorySettings,
@@ -38,6 +40,7 @@ export function TableItem({
   handleRadioChecked,
 }: Props) {
   const [visible, setVisible] = useState(false);
+  const teste = 0;
   if (isSettings) {
     null;
   } else if (isCategorySettings) {
@@ -79,12 +82,114 @@ export function TableItem({
         </td>
       </tr>
     );
+  } else if (isHome) {
+    const [itemCategory, setItemCategory] = useState<Category>({
+      id: "",
+      color: "",
+      title: "",
+      expense: false,
+      valueExpected: 0
+    });
+    // useEffect(() => {
+    //   if (item!.categoryId !== "") {
+    //     async function handleDetailsData() {
+    //       const queryItemById = query(
+    //         collection(db, pathFirebase.categories),
+    //         where("id", "==", item?.categoryId)
+    //       );
+    //       const categoryDetails: Category[] = await getFirebaseDataFilterById(
+    //         queryItemById
+    //       );
+    //       setItemCategory(categoryDetails[0]);
+    //     }
+    //     handleDetailsData();
+    //   } else {
+    //     setItemCategory({
+    //       id: "",
+    //       color: "",
+    //       title: "",
+    //       expense: false,
+    //       valueExpected: 0
+    //     });
+    //   }
+    // }, [item]);
+    const bgColor = itemCategory?.expense ? "bg-red-700" : "bg-green-700";
+    const textColor = itemCategory?.expense ? "text-red-600" : "text-green-600";
+    return (
+      <tr className="flex px-5 justify-between items-center">
+        {/* <td className="flex w-2/12 py-3 px-0 menuBreak:px-2 text-left">
+          {windowSize.innerWidth <= 857
+            ? formatDate(item!.date).slice(0, 5)
+            : formatDate(item!.date)}
+        </td> */}
+        {/* <td className="hidden menuBreak:flex w-2/12 py-3 px-0 menuBreak:px-2 text-left">
+          <div
+            className={`inline-block w-full mr-0 py-2 px-0 menuBreak:px-2 rounded ${bgColor}`}
+          >
+            {item!.categoryName}
+          </div>
+        </td> */}
+        <td className="flex w-3/12 menuBreak:w-4/12 py-3 px-0 menuBreak:px-2 text-left">
+          <a href="https://globo.com" target="_blank">
+            {category!.title}
+          </a>
+        </td>
+        {/* Valor esperado */}
+        <td className="flex w-3/12 py-3 px-0 menuBreak:px-2 text-right">
+          <div className={`inline-block w-full py-2 rounded ${textColor}`}>
+            {category?.valueExpected === undefined ? teste.toLocaleString("ita", {
+              style: "currency",
+              currency: "EUR",
+            }) : category!.valueExpected.toLocaleString("ita", {
+              style: "currency",
+              currency: "EUR",
+            })}
+          </div>
+        </td>
+        {/* Valor Gasto */}
+        <td className="flex w-3/12 py-3 px-0 menuBreak:px-2 text-right">
+          <div className={`inline-block w-full py-2 rounded text-red-500`}>
+            {category?.valueExpected === undefined ? teste.toLocaleString("ita", {
+              style: "currency",
+              currency: "EUR",
+            }) : category!.valueExpected.toLocaleString("ita", {
+              style: "currency",
+              currency: "EUR",
+            })}
+          </div>
+        </td>
+        {/* <td className="flex w-1/12 py-3 px-0 menuBreak:px-2 text-left ">
+          <ConfirmDialog
+            className="bg-red-800 p-5 border border-red-800 rounded-3xl flex gap-5 items-center w-64"
+            visible={visible}
+            onHide={() => setVisible(false)}
+            message={`Vuoi eliminare ${category!.title}?`}
+            header="Conferma"
+            icon={""}
+            accept={() => {
+              deleteFirebaseData(userId, "category", item!.id),
+                handleRadioChecked({ redditoValue: false, spesaValue: false });
+            }}
+            reject={() => setVisible(false)}
+          />
+          <div
+            className="w-10 text-right py-1 text-lg cursor-pointer"
+            onClick={() => {
+              setVisible(true);
+            }}
+          >
+            ⛔
+          </div>
+        </td> */}
+      </tr>
+    );
   } else {
     const [itemCategory, setItemCategory] = useState<Category>({
       id: "",
       color: "",
       title: "",
       expense: false,
+      valueExpected: 0
     });
     useEffect(() => {
       if (item!.categoryId !== "") {
@@ -105,6 +210,7 @@ export function TableItem({
           color: "",
           title: "",
           expense: false,
+          valueExpected: 0
         });
       }
     }, [item]);

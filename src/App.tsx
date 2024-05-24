@@ -55,6 +55,7 @@ function App() {
   const [logged, setLogged] = useState(true);
 
   const [isSettings, setIsSettings] = useState(false);
+  const [isHome, setIsHome] = useState(true);
   const [isCategorySettings, setIsCategorySettings] = useState(false);
   const [isMenu, setIsMenu] = useState(false);
   const [list, setList] = useState<Item[]>();
@@ -195,7 +196,6 @@ function App() {
     reddito: false,
     spesa: false,
   });
-  console.log(radioChecked);
 
   function handleRadioChecked({
     redditoValue,
@@ -242,6 +242,7 @@ function App() {
         title: category.title,
         color: category.color,
         expense: category.expense,
+        valueExpected: category.valueExpected,
       });
       toast.success(`Categoria aggiunta con successo! 👌`, {
         position: toast.POSITION.BOTTOM_RIGHT,
@@ -321,6 +322,7 @@ function App() {
           {/* ITENS */}
           <TableArea
             list={filteredList}
+            isHome={isHome}
             categoriesList={categoryList}
             isSettings={isSettings}
             isCategorySettings={isCategorySettings}

@@ -44,11 +44,13 @@ export function InputArea({
   const [titleField, setTitleField] = useState("");
   const [valueField, setValueField] = useState(0);
   const [provisoryValueField, setProvisoryValueField] = useState("0");
+  const [provisoryCategoryValueField, setProvisoryCategoryValueField] = useState("0");
   const [newCategory, setNewCategory] = useState<Category>({
     id: "",
     title: "",
     color: "",
     expense: false,
+    valueExpected: 0,
   });
   useEffect(() => {
     if (categoryField !== "") {
@@ -69,7 +71,7 @@ export function InputArea({
   }, [categoryField]);
 
   // let categoryKeys: string[] = Object.keys(categories);
-
+  
   const handleAddItem = () => {
     let errors: string[] = [];
 
@@ -122,6 +124,9 @@ export function InputArea({
     if (newCategory.color === "") {
       errors.push("Sceglere Reddito o Spesa!");
     }
+    if (newCategory.expense && newCategory.valueExpected === 0) {
+      errors.push("Sceglere il valore atteso!");
+    }
     if (errors.length > 0) {
       errors.map((fieldError) => {
         toast.error(fieldError, {
@@ -139,6 +144,7 @@ export function InputArea({
         title: newCategory.title,
         color: newCategory.color,
         expense: newCategory.expense,
+        valueExpected: newCategory.valueExpected,
       });
       clearFields();
     }
@@ -155,6 +161,7 @@ export function InputArea({
       title: "",
       color: "",
       expense: false,
+      valueExpected: 0
     });
     handleRadioChecked({ redditoValue: false, spesaValue: false });
   };
@@ -176,6 +183,29 @@ export function InputArea({
               onChange={(e) =>
                 setNewCategory({ ...newCategory, title: e.target.value })
               }
+            />
+          </div>
+          <div className="flex-1 m-3">
+            <div className="font-bold mb-1">Valore Atteso</div>
+            <CurrencyInput
+              className="w-full h-7 py-0 px-1 rounded bg-[#242424]"
+              id="input-example"
+              name="input-name"
+              placeholder="Immettere un valore"
+              value={provisoryCategoryValueField}
+              decimalsLimit={2}
+              decimalScale={2}
+              allowDecimals
+              decimalSeparator=","
+              intlConfig={{ locale: "ita", currency: "EUR" }}
+              onValueChange={(value) => {
+                if (value) {
+                  {
+                    setProvisoryCategoryValueField(value);
+                    setNewCategory({ ...newCategory, valueExpected: parseFloat(value.replace(",", ".")) });
+                  }
+                }
+              }}
             />
           </div>
           <div className="flex-1 m-3">
@@ -225,6 +255,7 @@ export function InputArea({
               </div>
             </div>
           </div>
+
         </div>
         <div className="basis-4/12 m-3">
           <div className="font-bold mb-1">&nbsp;</div>
@@ -275,10 +306,10 @@ export function InputArea({
                 <option></option>
                 {categoryList
                   ? categoryList.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.title}
-                      </option>
-                    ))
+                    <option key={category.id} value={category.id}>
+                      {category.title}
+                    </option>
+                  ))
                   : null}
               </>
             </select>
