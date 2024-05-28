@@ -1,34 +1,28 @@
-import { getAuth, signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { Header } from "./Header";
+import { filterListByMonth, getCurrentMonth } from "../helpers/dateFilter";
+import { Category, CategoryFormatted, Item, windowSizeProps } from "../@types";
+import { TableArea } from "./TableArea";
+import { InfoArea } from "./InfoArea";
+import { InputArea } from "./InputArea";
 import {
   Timestamp,
   collection,
   doc,
   getFirestore,
   onSnapshot,
-  orderBy,
   query,
   setDoc,
-  where,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { ToastContainer, toast } from "react-toastify";
+import { app, initFirebase } from "../db/Firebase";
 import "react-toastify/dist/ReactToastify.css";
-import { Category, CategoryFormatted, Item, windowSizeProps } from "./@types";
-import { Header } from "./components/Header";
-import { InfoArea } from "./components/InfoArea";
-import { InputArea } from "./components/InputArea";
-import { MenuModal } from "./components/MenuModal";
-import { SubmitLoading } from "./components/SubmitLoading";
-import { TableArea } from "./components/TableArea";
-import { LoginPage } from "./components/login/LoginPage";
-import { app, initFirebase } from "./db/Firebase";
-import {
-  filterListByMonth,
-  filterListByMonthAndCategory,
-  getCurrentMonth,
-} from "./helpers/dateFilter";
-import { getFirebaseData } from "./helpers/firebaseFunctions";
+import { ToastContainer, toast } from "react-toastify";
+import { getFirebaseData } from "../helpers/firebaseFunctions";
+import { MenuModal } from "./MenuModal";
+import { SubmitLoading } from "./SubmitLoading";
+import { getAuth, signOut } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { LoginPage } from "./login/LoginPage";
 
 // INITIALIZING FIRESTORE DB
 const db = getFirestore(app);
@@ -39,13 +33,14 @@ function getWindowSize() {
   return { innerWidth, innerHeight };
 }
 
-// TYPE RADIO CHECK VALUE
 export type HandleRadioCheckValueFunction = {
   redditoValue: boolean;
   spesaValue: boolean;
 };
 
-function App() {
+type Props = { categoryPageId: string }
+
+function CategoryListPage({ categoryPageId }: Props) {
   // INITIALIZING FIREBASE AND FIREBASE ADMIN
   initFirebase();
 
@@ -70,12 +65,10 @@ function App() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
   const [income, setIncome] = useState(0);
   const [expense, setExpense] = useState(0);
-  const [categoryAspectedExpense, setCategoryAspectedExpense] = useState(0);
   const [categoryList, setCategoryList] = useState<Category[]>([]);
   const [categoryFormatted, setCategoryFormatted] = useState<
     CategoryFormatted | Record<string, never>
   >({});
-  const [categoryListDetails, setCategoryListDetails] = useState<Category>();
 
   // PATH GLOBAL TO ITEMS AND CATEGORIES
   const pathFirebase = {
@@ -103,32 +96,14 @@ function App() {
 
   // GET DATA
   const handleData = async () => {
-    if (isHome) {
-      const itemsQuery = query(collection(db, pathFirebase.items));
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore for itemsListener
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-        const firebaseItems = await getFirebaseData("item", querySnapshot);
-        setList(firebaseItems);
-      });
-    } else {
-      const itemsQuery = query(
-        collection(db, pathFirebase.items),
-        orderBy("date")
-      );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore for itemsListener
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-        const firebaseItems = await getFirebaseData("item", querySnapshot);
-        setList(firebaseItems);
-      });
-    }
+    const itemsQuery = query(collection(db, pathFirebase.items));
+    //@ts-ignore for itemsListener
+    const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
+      const firebaseItems = await getFirebaseData("item", querySnapshot);
+      setList(firebaseItems);
+    });
     const categoriesQuery = query(collection(db, pathFirebase.categories));
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore for categoriesListener
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //@ts-ignore for categoriesListener
     const categoriesListener = onSnapshot(
       categoriesQuery,
       async (querySnapshot) => {
@@ -149,140 +124,48 @@ function App() {
     } else {
       setLogged(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // LOGOUT FUNCTION
   function logoutFunction() {
     signOut(auth);
     setIsMenu(false);
     setLogin(true);
   }
 
-  // RESET CURRENT MONTH
-  // useEffect(() => {
-  //   if (isHome) {
-  //     const itemsQuery = query(collection(db, pathFirebase.items));
-  //     //@ts-ignore for itemsListener
-  //     const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-  //       const firebaseItems = await getFirebaseData("item", querySnapshot);
-  //       setList(firebaseItems);
-  //     });
-  //   } else {
-  //     const itemsQuery = query(
-  //       collection(db, pathFirebase.items),
-  //       orderBy("date")
-  //     );
-  //     //@ts-ignore for itemsListener
-  //     const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-  //       const firebaseItems = await getFirebaseData("item", querySnapshot);
-  //       setList(firebaseItems);
-  //     });
-  //   }
-  //   setCurrentMonth(getCurrentMonth);
-  // }, [isHome]);
-
-  // MONITORING CURRENT MONTH
+  useEffect(() => {
+    list ? setFilteredList(filterListByMonth(list, currentMonth)) : null;
+  }, [list, currentMonth]);
 
   useEffect(() => {
-    if (isHome) {
-      if (list) {
-        setFilteredList(filterListByMonth(list, currentMonth));
-      }
-    } else {
-      if (list) {
-        setFilteredList(
-          filterListByMonthAndCategory(list, currentMonth, categoryListDetails!)
-        );
-      }
-    }
-  }, [list, currentMonth, isHome, categoryListDetails]);
-
-  // GET CATEGORY LIST
-  useEffect(() => {
-    let categoryExpenseCount = 0;
     if (categoryList) {
       categoryList.forEach((category: Category) => {
-        category.valueExpected
-          ? (categoryExpenseCount += category.valueExpected)
-          : null,
-          setCategoryFormatted((prevData) => ({
-            ...prevData,
-            [category.id]: {
-              id: category.id,
-              color: category.color,
-              title: category.title,
-              expense: category.expense,
-              valueExpected: category.valueExpected,
-            },
-          }));
+        setCategoryFormatted((prevData) => ({
+          ...prevData,
+          [category.id]: {
+            id: category.id,
+            color: category.color,
+            title: category.title,
+            expense: category.expense,
+          },
+        }));
       });
     }
   }, [categoryList]);
 
-  // GET INCOME/EXPENSE/CATEGORY ASPECTED EXPENSE
   useEffect(() => {
-    const categoryMonthIds: string[] = [];
     let incomeCount = 0;
     let expenseCount = 0;
-    let categoryMonthAspectedExpense = 0;
-    if (isHome) {
-      for (const i in filteredList) {
-        if (categoryFormatted[filteredList[i].categoryId].expense) {
-          expenseCount += filteredList[i].value;
-        } else {
-          incomeCount += filteredList[i].value;
-        }
-        categoryMonthIds.includes(filteredList[i].categoryId)
-          ? null
-          : categoryMonthIds.push(filteredList[i].categoryId);
+
+    for (let i in filteredList) {
+      if (categoryFormatted[filteredList[i].categoryId].expense) {
+        expenseCount += filteredList[i].value;
+      } else {
+        incomeCount += filteredList[i].value;
       }
-      setIncome(incomeCount);
-      setExpense(expenseCount);
-      categoryMonthIds.forEach((id: string) => {
-        const categoriesQuery = query(
-          collection(db, pathFirebase.categories),
-          where("id", "==", id)
-        );
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore for categoriesListener
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const categoriesListener = onSnapshot(
-          categoriesQuery,
-          async (querySnapshot) => {
-            const firebaseCategoriesItems: Category[] = await getFirebaseData(
-              "category",
-              querySnapshot
-            );
-            firebaseCategoriesItems[0].valueExpected
-              ? (categoryMonthAspectedExpense +=
-                  firebaseCategoriesItems[0].valueExpected)
-              : null;
-            setCategoryAspectedExpense(categoryMonthAspectedExpense);
-          }
-        );
-      });
-    } else if (categoryListDetails !== undefined) {
-      for (const i in filteredList) {
-        if (categoryListDetails.expense) {
-          expenseCount += filteredList[i].value;
-        } else {
-          incomeCount += filteredList[i].value;
-        }
-      }
-      setIncome(incomeCount);
-      setExpense(expenseCount);
-    } else {
-      setIncome(999999999);
-      setExpense(999999998);
     }
-  }, [
-    categoryFormatted,
-    categoryListDetails,
-    filteredList,
-    isHome,
-    pathFirebase.categories,
-  ]);
+    setIncome(incomeCount);
+    setExpense(expenseCount);
+  }, [filteredList]);
 
   function handleMonthChange(newMonth: string) {
     setCurrentMonth(newMonth);
@@ -304,12 +187,6 @@ function App() {
     setIsCategorySettings(false);
     setIsSettings(false);
     setIsMenu(false);
-    setIsHome(true);
-  }
-
-  function handleCategoryItemsList(categoryListDetails: Category) {
-    setCategoryListDetails(categoryListDetails);
-    setIsHome(false);
   }
 
   function handleIsMenu() {
@@ -429,9 +306,6 @@ function App() {
             expense={expense}
             isSettings={isSettings}
             isCategorySettings={isCategorySettings}
-            isHome={isHome}
-            categoryListDetails={categoryListDetails!}
-            categoryAspectedExpense={categoryAspectedExpense}
           />
           {/* INSERÇÃO */}
           {isSettings ? null : (
@@ -450,19 +324,14 @@ function App() {
           {/* ITENS */}
           <TableArea
             list={filteredList}
-            allList={list}
             isHome={isHome}
-            currentMonth={currentMonth}
-            income={income}
             categoriesList={categoryList}
             isSettings={isSettings}
             isCategorySettings={isCategorySettings}
             windowSize={windowSize}
             pathFirebase={pathFirebase}
             userId={user ? user?.uid : "fail"}
-            categoryListDetails={categoryListDetails!}
             handleRadioChecked={handleRadioChecked}
-            handleCategoryItemsList={handleCategoryItemsList}
           />
         </div>
       )}
@@ -470,4 +339,4 @@ function App() {
   );
 }
 
-export default App;
+export default CategoryListPage;

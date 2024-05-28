@@ -5,7 +5,7 @@ type Props = {
 
 export function ResumeItem({ title, value }: Props) {
   const colorText =
-    title === "Despesas"
+    title === "Valore Speso"
       ? "text-red-600"
       : value >= 0
       ? "text-green-600"

@@ -1,4 +1,4 @@
-import { Item } from "../@types";
+import { Category, Item } from "../@types";
 
 // GET CURRENT MONTH
 export function getCurrentMonth() {
@@ -15,6 +15,24 @@ export function filterListByMonth(list: Item[], date: string): Item[] {
     if (
       list[i].date.getFullYear() === parseInt(year) &&
       list[i].date.getMonth() + 1 === parseInt(month)
+    ) {
+      newList.push(list[i]);
+    }
+  }
+
+  return newList;
+}
+
+// FILTER ITEMS FROM CURRENT MONTH AND CATEGORY
+export function filterListByMonthAndCategory(list: Item[], date: string, categoryListDetails: Category): Item[] {
+  let newList: Item[] = [];
+  let [year, month] = date.split("-");
+
+  for (let i in list) {
+    if (
+      list[i].date.getFullYear() === parseInt(year) &&
+      list[i].date.getMonth() + 1 === parseInt(month) &&
+      list[i].categoryId === categoryListDetails.id
     ) {
       newList.push(list[i]);
     }

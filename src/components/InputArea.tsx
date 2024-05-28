@@ -43,8 +43,10 @@ export function InputArea({
   const [categoryNameField, setCategoryNameField] = useState("");
   const [titleField, setTitleField] = useState("");
   const [valueField, setValueField] = useState(0);
+  const [isReditto, setIsReditto] = useState(true);
   const [provisoryValueField, setProvisoryValueField] = useState("0");
-  const [provisoryCategoryValueField, setProvisoryCategoryValueField] = useState("0");
+  const [provisoryCategoryValueField, setProvisoryCategoryValueField] =
+    useState("0");
   const [newCategory, setNewCategory] = useState<Category>({
     id: "",
     title: "",
@@ -52,28 +54,32 @@ export function InputArea({
     expense: false,
     valueExpected: 0,
   });
+
+  // HANDLE DETAILS DATA FUNCTION
+  async function handleDetailsData() {
+    const queryCategoryById = query(
+      collection(db, pathFirebase.categories),
+      where("id", "==", categoryField)
+    );
+    const categoryDetails: Category[] = await getFirebaseDataFilterById(
+      queryCategoryById
+    );
+    setCategoryNameField(categoryDetails[0].title);
+  }
+
   useEffect(() => {
     if (categoryField !== "") {
-      async function handleDetailsData() {
-        const queryCategoryById = query(
-          collection(db, pathFirebase.categories),
-          where("id", "==", categoryField)
-        );
-        const categoryDetails: Category[] = await getFirebaseDataFilterById(
-          queryCategoryById
-        );
-        setCategoryNameField(categoryDetails[0].title);
-      }
       handleDetailsData();
     } else {
       setCategoryNameField("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryField]);
 
   // let categoryKeys: string[] = Object.keys(categories);
-  
+
   const handleAddItem = () => {
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     if (isNaN(new Date(dateField).getTime())) {
       errors.push("Data non valida!");
@@ -116,7 +122,7 @@ export function InputArea({
   };
 
   const handleAddCategory = () => {
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     if (newCategory.title === "") {
       errors.push("Titolo vuoto!");
@@ -156,18 +162,20 @@ export function InputArea({
     setTitleField("");
     setProvisoryValueField("");
     setValueField(0);
+    setIsReditto(true);
     setNewCategory({
       id: "",
       title: "",
       color: "",
       expense: false,
-      valueExpected: 0
+      valueExpected: 0,
     });
     handleRadioChecked({ redditoValue: false, spesaValue: false });
   };
 
   useEffect(() => {
     clearFields();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCategorySettings, isSettings]);
 
   if (isCategorySettings) {
@@ -183,29 +191,6 @@ export function InputArea({
               onChange={(e) =>
                 setNewCategory({ ...newCategory, title: e.target.value })
               }
-            />
-          </div>
-          <div className="flex-1 m-3">
-            <div className="font-bold mb-1">Valore Atteso</div>
-            <CurrencyInput
-              className="w-full h-7 py-0 px-1 rounded bg-[#242424]"
-              id="input-example"
-              name="input-name"
-              placeholder="Immettere un valore"
-              value={provisoryCategoryValueField}
-              decimalsLimit={2}
-              decimalScale={2}
-              allowDecimals
-              decimalSeparator=","
-              intlConfig={{ locale: "ita", currency: "EUR" }}
-              onValueChange={(value) => {
-                if (value) {
-                  {
-                    setProvisoryCategoryValueField(value);
-                    setNewCategory({ ...newCategory, valueExpected: parseFloat(value.replace(",", ".")) });
-                  }
-                }
-              }}
             />
           </div>
           <div className="flex-1 m-3">
@@ -228,6 +213,7 @@ export function InputArea({
                       expense: false,
                       color: "green",
                     });
+                    setIsReditto(true);
                   }}
                 />
                 <label htmlFor="Reddito">Reddito</label>
@@ -249,13 +235,43 @@ export function InputArea({
                       expense: true,
                       color: "red",
                     });
+                    setIsReditto(false);
                   }}
                 />
                 <label htmlFor="Spesa">Spesa</label>
               </div>
             </div>
           </div>
-
+          {!isReditto ? (
+            <div className="flex-1 m-3">
+              <div className="font-bold mb-1">Valore Atteso</div>
+              <CurrencyInput
+                className="w-full h-7 py-0 px-1 rounded bg-[#242424]"
+                id="input-example"
+                name="input-name"
+                placeholder="Immettere un valore"
+                value={provisoryCategoryValueField}
+                decimalsLimit={2}
+                decimalScale={2}
+                allowDecimals
+                decimalSeparator=","
+                intlConfig={{ locale: "ita", currency: "EUR" }}
+                onValueChange={(value) => {
+                  if (value) {
+                    {
+                      setProvisoryCategoryValueField(value);
+                      setNewCategory({
+                        ...newCategory,
+                        valueExpected: parseFloat(value.replace(",", ".")),
+                      });
+                    }
+                  }
+                }}
+              />
+            </div>
+          ) : (
+            <div className="flex-1 m-3"></div>
+          )}
         </div>
         <div className="basis-4/12 m-3">
           <div className="font-bold mb-1">&nbsp;</div>
@@ -306,10 +322,10 @@ export function InputArea({
                 <option></option>
                 {categoryList
                   ? categoryList.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.title}
-                    </option>
-                  ))
+                      <option key={category.id} value={category.id}>
+                        {category.title}
+                      </option>
+                    ))
                   : null}
               </>
             </select>

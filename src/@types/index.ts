@@ -17,6 +17,13 @@ export type CategoryFormatted = {
   };
 };
 
+// CATEGORIES EXPENSE DESCRIPTION
+export type CategoryExpense = {
+  [tag: string]: {
+    expense: number;
+  };
+};
+
 // CATEGORIES DESCRIPTION
 export type Category = {
   id: string;
