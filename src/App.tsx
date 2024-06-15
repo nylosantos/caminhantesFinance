@@ -103,29 +103,21 @@ function App() {
 
   // GET DATA
   const handleData = async () => {
-    if (isHome) {
-      const itemsQuery = query(collection(db, pathFirebase.items));
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore for itemsListener
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-        const firebaseItems = await getFirebaseData("item", querySnapshot);
-        setList(firebaseItems);
-      });
-    } else {
-      const itemsQuery = query(
-        collection(db, pathFirebase.items),
-        orderBy("date")
-      );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore for itemsListener
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
-        const firebaseItems = await getFirebaseData("item", querySnapshot);
-        setList(firebaseItems);
-      });
-    }
-    const categoriesQuery = query(collection(db, pathFirebase.categories));
+    const itemsQuery = query(
+      collection(db, pathFirebase.items),
+      orderBy("date")
+    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore for itemsListener
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const itemsListener = onSnapshot(itemsQuery, async (querySnapshot) => {
+      const firebaseItems = await getFirebaseData("item", querySnapshot);
+      setList(firebaseItems);
+    });
+    const categoriesQuery = query(
+      collection(db, pathFirebase.categories),
+      orderBy("title")
+    );
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore for categoriesListener
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

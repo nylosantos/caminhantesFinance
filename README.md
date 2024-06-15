@@ -1,3 +1,3 @@
-# Caminhantes Finance
+# Persan Finance
 
-Caminhantes Finance is a simple web application build in ReactJS
+Persan Finance is a simple web application build in ReactJS

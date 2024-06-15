@@ -229,7 +229,7 @@ export function TableItem({
         <tr className="flex px-5 justify-between items-center">
           {/* Nome Categoria */}
           <td
-            className="flex w-3/12 menuBreak:w-4/12 py-3 px-0 menuBreak:px-2 text-left"
+            className="flex w-3/12 menuBreak:w-4/12 py-3 px-0 menuBreak:px-2 text-left cursor-pointer"
             onClick={() => {
               handleCategoryItemsList(category);
             }}

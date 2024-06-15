@@ -39,7 +39,7 @@ export function Header({
       ) : null}
       <div className="flex w-full justify-center">
         <h1 className="font-assistant font-bold text-4xl menuBreak:text-5xl m-0 p-0 menuBreak:-mt-3 pt-12">
-          Caminhantes Finance
+          Persan Finance
         </h1>
       </div>
     </div>
